@@ -1,0 +1,128 @@
+@import url('https:/fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+
+
+.container_2 {
+    display: flex; 
+    width: 50%;
+    float: right; 
+}
+
+.container_2 div {
+    display: inline-block;
+    vertical-align: middle; 
+    margin-right: 20px; 
+    margin-top: 20px;
+    margin-left: 100px;
+}
+
+.container label {
+    flex: 0 0 100px; 
+    margin-right: 0; 
+    text-align: right;
+    padding: 0px;
+    border-radius: 15px;
+  }
+.container h2 {
+    justify-content: left;
+    display: flex;
+    margin-bottom: 10px;
+    align-items: center;
+    margin-left: 10px;
+}
+.container select,
+.container input[type="text"] {
+    flex: 1; 
+    border: 1px solid #ccc;
+    padding: 3px;
+    border-radius: 15px;
+}
+
+body{
+    background: #a1c398;
+    background-size: 360% 360%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+.header {
+    padding: 3px;
+    display: flex;
+    align-items: flex-start;
+}
+.header p {
+    margin-bottom: 0;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    text-indent: -10px;
+}
+.header p img  {
+    margin-top: auto;
+    margin-bottom: 10px;
+    margin-right: 3px;
+    height: 70px;
+    width: 70px;
+    position: relative;
+}
+
+.header a {
+    font-style: normal;
+    font-family: 'poppins', sans-serif;
+    color: black;
+    text-decoration: none;
+    margin-top: 15px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 90%; 
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0 auto; 
+}
+.category-panel {
+    width: 60%;
+    margin: 0 auto;
+}
+.product-panel {
+    width: 60%;
+    margin: 0 auto;
+}
+.supplier-panel {
+    width: 60%;
+    margin: 0 auto;
+}
+table {
+    border-collapse: collapse; /* Collapse borders to remove spacing */
+    width: 90%;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0 auto;
+    border-radius: 15px; /* Adjust the border-radius value to control the curvature */
+    overflow: hidden; /* Ensures that the curved border-radius is applied */
+}
+table th, table td {
+    background-color: #FAF9F6;
+    padding: 15px 10px;
+    text-align: center;
+    font-family: poppins, sans-serif;
+    font-size: 13px;
+    border-radius: 0; /* Resetting the border-radius for individual table cells */
+}
+table th {
+    background-color: #FFA2B9;
+    color: black;
+    font-family: 'poppins', Sans-serif;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 0; /* Resetting the border-radius for table headers */
+}
+
+.no-results {
+    color: red;
+}

@@ -1,0 +1,223 @@
+@import url('https:/fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+*
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+.nav-menu a {
+    position: right;  
+    font-style: normal;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    text-decoration: none;
+    list-style: none;  
+    margin-left: 1000px;         
+    color: black;
+}
+  
+body {
+    background:#111;
+}
+section {
+    height: 200vh;
+    background: url(bg2.jpg);
+    background-size: cover;
+    background-attachment: fixed;
+}
+section.sec2 {
+    height: 100vh;
+    background: #A1C398;
+    background-size: contain;
+    background-attachment: fixed;
+}
+.text {
+    height: 50vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.text h2 {
+    color: white;
+    font-size: 3em;
+    font-weight: 200;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    line-height: 2.5em;
+}
+.text h2 span {
+    font-size: 4em;
+    font-weight: 900;
+    letter-spacing: 0em;
+    background: #A1C398;
+    background-size: cover;
+    background-attachment: fixed;
+    background-clip: text;
+    color: transparent;
+}
+
+/*HEADER*/
+.header {
+    background-color: #A1C398;
+    padding: 30px;
+    display: flex;
+    align-items: flex-start;
+}
+.header p {
+    margin-bottom: 0;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+    text-indent: -10px;
+}
+.header p img  {
+    margin-top: auto;
+    margin-bottom: 10px;
+    margin-right: 3px;
+    height: 70px;
+    width: 70px;
+    position: relative;
+}
+
+.header a {
+    font-style: normal;
+    font-family: 'Poppins', sans-serif;
+    color: black;
+    text-decoration: none;
+    margin-top: 12px;
+}
+
+/*wel*/
+body {
+    font-family: "Century Gothic", 'Lato', sans-serif;
+}
+a {
+text-decoration: none;
+}
+.et-hero-tabs,
+.et-slide {
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+height: 590px;
+position: relative;
+background: #A1C398;
+    text-align: left;
+    padding: 0 2em;
+h1 {
+    font-size: 20rem;
+    margin: 0;
+    letter-spacing: 1rem;
+}
+h3 {
+    font-size: 1rem;
+    letter-spacing: 0.3rem;
+    opacity: 0.6;
+}
+}
+
+@media (min-width: 800px) {
+.et-hero-tabs,
+.et-slide {
+h1 {
+    font-size: 3rem;
+    margin-top: -180px;
+}
+h3 {
+    font-size: 1rem;
+}
+}
+
+}
+
+/*HOVER*/
+button {
+    height: 4em;
+    width: 15em;
+    border: none;
+    border-radius: 40px;
+    background-color: #fff;
+    cursor: pointer;
+    margin-top: 100px;
+    margin-bottom: 50px;
+  }
+button span {
+    z-index: 1;
+    display: inline-block;
+    background-color: black;
+    height: 3em;
+    width: 11.5em;
+    border-radius: 25px;
+    color: #fff;
+    line-height: 55px;
+    font-size: 18px;
+    letter-spacing: 3px;
+    transition: all 0.5s;
+  }
+button .container {
+    z-index: -1;
+    width: 0;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    transform: translateY(-50px);
+    transition: all 0.4s;
+  }
+button .container img {
+    padding: 0 5px;
+    margin-top: 6px;
+    justify-content: space-evenly;
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+button:hover span {
+    width: 0;
+  }
+button:hover .container {
+    z-index: 2;
+    width: 100%;
+  }
+
+
+.values {
+    padding: 30px 10px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.values .val-box {
+    background: #fff;
+    width: 180px;
+    margin-left: 20px;
+    padding: 16px 20px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+.values .val-box i {
+   font-size: 25px;
+   width: 60px;
+   height: 60px;
+   line-height: 60px;
+   border-radius: 50%;
+   text-align: center;
+   color: #fff;
+   margin-right: 15px;
+}
+.values .val-box h3 {
+    font-size: 18px;
+    font-weight: 600;
+}
+.values .val-box span {
+    font-size: 15px;
+    color: #828997;
+}
+
