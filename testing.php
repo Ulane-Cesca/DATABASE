@@ -138,38 +138,81 @@
     function closeModal() {
         document.getElementById('editModal').style.display = 'none';
     }
+    function editRecord(table, id) {
+    fetch(`fetch_record.php?table=${table}&id=${id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const record = data.record;
+                const form = document.getElementById('editForm');
+                form.innerHTML = '';
+
+                for (const [key, value] of Object.entries(record)) {
+                    const container = document.createElement('div');
+                    container.classList.add('input-container');
+                    const label = document.createElement('label');
+                    label.textContent = key;
+                    label.classList.add('small-label');
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.name = key;
+                    input.value = value;
+                    container.appendChild(label);
+                    container.appendChild(input);
+                    form.appendChild(container);
+                }
+
+                const submitButton = document.createElement('button');
+                submitButton.type = 'submit';
+                submitButton.textContent = 'Save';
+                form.appendChild(submitButton);
+
+                form.dataset.table = table;
+                form.dataset.id = id;
+
+                document.getElementById('editModal').style.display = 'block';
+            } else {
+                console.error('Error fetching record:', data.error);
+            }
+        })
+        .catch(error => console.error('Error fetching record:', error));
+}
 
     function submitEditForm(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
-        });
+            event.preventDefault();
 
-        fetch('update_record.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                table: document.querySelector('select[name="tableSelect"]').value,
-                id: formData.get(Object.keys(data)[0]),
-                data: data
-            })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    document.getElementById('tableForm').submit();
-                } else {
-                    alert(data.message);
-                }
+            const form = event.target;
+            const table = form.dataset.table;
+            const id = form.dataset.id;
+            const formData = new FormData(form);
+
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
             });
 
-        closeModal();
-    }
+            fetch('update_record.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ table, id, data })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Record updated successfully.');
+                    closeModal();
+                    submitForm();
+                } else {
+                    alert('Failed to update record: ' + result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the record.');
+            });
+        }
     async function deleteRecord(table, id) {
     if (confirm("Are you sure you want to delete this record?")) {
         try {
