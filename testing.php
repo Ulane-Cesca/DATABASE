@@ -1,306 +1,353 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<style>   h2 {text-indent: 75px;} a{font: 'poppins', bold;}</style>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Information</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Inventory Management</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .title {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .form-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-controls div {
+            margin: 10px 0;
+        }
+
+        .pagination-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination-container a {
+            margin: 0 5px;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            color: #000;
+        }
+
+        .pagination-container a.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+        <script>
+    function changePage(table, page) {
+        document.querySelector(`input[name="${table}_page"]`).value = page;
+        document.getElementById('tableForm').submit();
+    }
+
+    function editRecord(table, id) {
+        fetch(`fetch_record.php?table=${table}&id=${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const form = document.getElementById('editForm');
+                    form.innerHTML = '';
+
+                    Object.keys(data.record).forEach(key => {
+                        const value = data.record[key];
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.name = key;
+                        input.value = value;
+                        input.placeholder = key;
+                        form.appendChild(input);
+                    });
+
+                    const submitButton = document.createElement('button');
+                    submitButton.type = 'submit';
+                    submitButton.textContent = 'Save Changes';
+                    form.appendChild(submitButton);
+
+                    document.getElementById('editModal').style.display = 'block';
+                } else {
+                    alert(data.message);
+                }
+            });
+    }
+
+    function closeModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    function submitEditForm(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+
+        fetch('update_record.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                table: document.querySelector('select[name="tableSelect"]').value,
+                id: formData.get(Object.keys(data)[0]),
+                data: data
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    document.getElementById('tableForm').submit();
+                } else {
+                    alert(data.message);
+                }
+            });
+
+        closeModal();
+    }
+    async function deleteRecord(table, id) {
+    if (confirm("Are you sure you want to delete this record?")) {
+        try {
+            const response = await fetch('delete_record.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ table, id }) // Sending table and id as JSON data
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert('Record deleted successfully.');
+                changePage(table, 1); // Reload the page or update the table after deletion
+            } else {
+                alert('Failed to delete record: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the record.');
+        }
+    }
+}
+
+</script>
 
 </head>
 <body>
-  <div class= "header">
-    <p><img src="l2.png" alt="Logo"><a href="home.php">SADE GROCERY</a></p>
-  </div>
-
     <div class="container">
-        <h2>Information<a href="add.php">
-            <img
-                src="add.png"
-                alt="Icon"
-                width="45"
-                height="35"
-                class="icon"
-            > </a></h2>
-
-        <div class="container_2">
-            <div>
-                <label for="selection">Information Type:</label>
-                <select id="selection">
-                    <option value="all" selected>All</option>
-                <option value="categories">Categories</option>
-                <option value="products">Products</option>
-                <option value="suppliers">Suppliers</option>
+        <h1 class="title">Inventory Management</h1>
+        <form id="tableForm" method="POST" action="">
+            <div class="form-controls">
+                <div class="buttons">
+                    <div>
+                        <input type="text" name="searchID" placeholder="Search by ID" value="<?= htmlspecialchars($_POST['searchID'] ?? '') ?>" onkeydown="if (event.key === 'Enter') { this.form.submit(); return false; }">
+                    </div>
+                </div>
+                <select id="tableSelect" name="tableSelect" onchange="this.form.submit()">
+                    <option value="products" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'products' ? 'selected' : '' ?>>Products</option>
+                    <option value="category" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'category' ? 'selected' : '' ?>>Category</option>
+                    <option value="supplier" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'supplier' ? 'selected' : '' ?>>Suppliers</option>
                 </select>
             </div>
-            <div>
-                <label for="search_term">Search:</label>
-                <input type="text" name="search_term" id="search_term">
-                <input type="button" id="search_button" value="Search">
+            <input type="hidden" name="products_page" value="<?= $_POST['products_page'] ?? 1 ?>">
+            <input type="hidden" name="category_page" value="<?= $_POST['category_page'] ?? 1 ?>">
+            <input type="hidden" name="supplier_page" value="<?= $_POST['supplier_page'] ?? 1 ?>">
+        </form>
+
+        <?php
+        $conn = new mysqli("127.0.0.1", "root", "", "project");
+
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        $selectedTable = $_POST['tableSelect'] ?? 'products';
+        $searchID = $_POST['searchID'] ?? '';
+
+        $limit = 10;
+        $products_page = $_POST['products_page'] ?? 1;
+        $category_page = $_POST['category_page'] ?? 1;
+        $supplier_page = $_POST['supplier_page'] ?? 1;
+
+        switch ($selectedTable) {
+            case 'products':
+                $page = $products_page;
+                break;
+            case 'category':
+                $page = $category_page;
+                break;
+            case 'supplier':
+                $page = $supplier_page;
+                break;
+            default:
+                $page = 1;
+                break;
+        }
+
+        $offset = ($page - 1) * $limit;
+
+        switch ($selectedTable) {
+            case 'products':
+                $sql = "SELECT * FROM products WHERE product_id LIKE '%$searchID%' LIMIT $limit OFFSET $offset";
+                $countSql = "SELECT COUNT(*) AS count FROM products WHERE product_id LIKE '%$searchID%'";
+                break;
+            case 'category':
+                $sql = "SELECT * FROM category WHERE category_id LIKE '%$searchID%' LIMIT $limit OFFSET $offset";
+                $countSql = "SELECT COUNT(*) AS count FROM category WHERE category_id LIKE '%$searchID%'";
+                break;
+            case 'supplier':
+                $sql = "SELECT * FROM supplier WHERE supplier_id LIKE '%$searchID%' LIMIT $limit OFFSET $offset";
+                $countSql = "SELECT COUNT(*) AS count FROM supplier WHERE supplier_id LIKE '%$searchID%'";
+                break;
+            default:
+                $sql = "SELECT * FROM products LIMIT $limit OFFSET $offset";
+                $countSql = "SELECT COUNT(*) AS count FROM products";
+                break;
+        }
+
+        $result = $conn->query($sql);
+        $countResult = $conn->query($countSql);
+        $rowCount = $countResult->fetch_assoc()['count'];
+
+        if ($result->num_rows > 0) {
+            echo "<table>";
+            echo "<tr>";
+
+            switch ($selectedTable) {
+                case 'products':
+                    echo "<th>Product ID</th><th>Product Name</th><th>Supplier ID</th><th>Category ID</th><th>Price</th><th>Actions</th>";
+                    break;
+                case 'category':
+                    echo "<th>Category ID</th><th>Category Name</th><th>Actions</th>";
+                    break;
+                case 'supplier':
+                    echo "<th>Supplier ID</th><th>Supplier Name</th><th>Contact Person</th><th>Contact Number</th><th>Actions</th>";
+                    break;
+            }
+
+            echo "</tr>";
+
+            while ($row = $result->fetch_assoc()) {
+                echo "<tr>";
+                $idKey = '';
+            
+                switch ($selectedTable) {
+                    case 'products':
+                        $idKey = 'product_id';
+                        echo "<td>{$row['product_id']}</td><td>{$row['product_name']}</td><td>{$row['supplier_id']}</td><td>{$row['category_id']}</td><td>{$row['price']}</td>";
+                        break;
+                    case 'category':
+                        $idKey = 'category_id';
+                        echo "<td>{$row['category_id']}</td><td>{$row['category_name']}</td>";
+                        break;
+                    case 'supplier':
+                        $idKey = 'supplier_id';
+                        echo "<td>{$row['supplier_id']}</td><td>{$row['supplier_name']}</td><td>{$row['contact_person']}</td><td>{$row['contact_number']}</td>";
+                        break;
+                }
+            
+                echo "<td class='action-buttons'>
+                <button onclick=\"editRecord('$selectedTable', '{$row[$idKey]}')\">Edit</button>
+                        <button onclick=\"deleteRecord('$selectedTable', '{$row[$idKey]}')\">Delete</button>
+                      </td>";
+    
+                echo "</tr>";
+            }
+            
+
+            echo "</table>";
+        } else {
+            echo '<div style="text-align: center; color: black; font-size: 16px; margin-top:50px;">No records found.</div>';
+        }
+
+        $totalPages = ceil($rowCount / $limit);
+
+        if ($totalPages > 1) {
+            echo "<div class='pagination-container'>";
+            for ($i = 1; $i <= $totalPages; $i++) {
+                $activeClass = ($i == $page) ? 'active' : '';
+                echo "<a href='javascript:void(0)' class='$activeClass' onclick=\"changePage('$selectedTable', $i)\">$i</a>";
+            }
+            echo "</div>";
+        }
+
+        $conn->close();
+        ?>
+
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Edit Record</h2>
+                <form id="editForm" onsubmit="submitEditForm(event)">
+                    <!-- Form fields will be dynamically inserted here -->
+                </form>
             </div>
         </div>
     </div>
-
-
-    <div id="all">
-        <table id="allTable">
-        <tr>
-                <th>CATEGORY ID</th>
-                <th>CATEGORY NAME</th>
-                <th>SUPPLIER ID</th>
-                <th>SUPPLIER NAME</th>
-                <th>CONTACT PERSON</th>
-                <th>CONTACT NUMBER</th>
-                <th>PRODUCT ID</th>
-                <th>PRODUCT NAME</th>
-                <th>PRICE</th>
-            </tr>
-                <?php
-                    $servername = "localhost";
-                    $username = "root";
-                    $password = "";
-                    $dbname = "project";
-                    $conn = new mysqli($servername, $username, $password, $dbname);
-                    if ($conn->connect_error) {
-                        die("Connection failed: " . $conn->connect_error);
-                    }
-                    $sql = "SELECT c.category_id, c.category_name, p.supplier_id, s.supplier_name, s.contact_person, s.contact_number,  p.product_id, p.product_name, p.price
-                            FROM Category c 
-                            JOIN Products p ON c.category_id = p.category_id 
-                            JOIN Supplier s ON p.supplier_id = s.supplier_id";
-                    $result = $conn->query($sql);
-                    if (mysqli_num_rows($result) > 0) {
-                        // Output data of each row
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<tr>";
-                            echo "<td>" . $row["category_id"] . "</td>";
-                            echo "<td>" . $row["category_name"] . "</td>";
-                            echo "<td>" . $row["supplier_id"] . "</td>";
-                            echo "<td>" . $row["supplier_name"] . "</td>";
-                            echo "<td>" . $row["contact_person"] . "</td>";
-                            echo "<td>" . $row["contact_number"] . "</td>";
-                            echo "<td>" . $row["product_id"] . "</td>";
-                            echo "<td>" . $row["product_name"] . "</td>";
-                            echo "<td>" . $row["price"] . "</td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='5'>No data found</td></tr>";
-                    }
-                    $conn->close();
-                ?>
-        </table>
-    </div>
-
-    <div id="categories" style="display:none;">
-        
-        <table id="categoryTable">
-                <tr>
-                    <th>CATEGORY ID</th>
-                    <th>CATEGORY NAME</th>
-                    <th>ACTIONS</th>
-                </tr>
-                <?php
-                    $servername = "127.0.0.1";
-                    $username = "root";
-                    $password = "";
-                    $dbname = "project";
-                    $conn = new mysqli($servername, $username, $password, $dbname);
-                    if ($conn->connect_error) {
-                        die("Connection failed: " . $conn->connect_error);
-                    }
-
-                    $sql = "SELECT category_id, category_name FROM Category";
-                    $category_result = $conn->query($sql);
-                    if ($category_result->num_rows > 0) {
-                        while($category_row = $category_result->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>".$category_row["category_id"]."</td>";
-                            echo "<td>".$category_row["category_name"]."</td>";
-                            echo "<td>".
-                            "<button>Edit</button>" 
-                            ."<button>Delete</button>".
-                          "</td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='2'>No categories found</td></tr>";
-                    }
-                    $conn->close();
-                ?>
-        </table>
-    </div>
-
-    <div id="products" style="display:none;">
-        
-        <table id="productTable">
-                <tr>
-                    <th>PRODUCT ID</th>
-                    <th>PRODUCT NAME</th>
-                    <th>SUPPLIER ID</th>
-                    <th>CATEGORY ID</th>
-                    <th>PRICE</th>
-                    <th>ACTIONS</th>
-                </tr>
-                <?php
-                    $servername = "127.0.0.1";
-                    $username = "root";
-                    $password = "";
-                    $dbname = "project";
-                    $conn = new mysqli($servername, $username, $password, $dbname);
-                    if ($conn->connect_error) {
-                        die("Connection failed: " . $conn->connect_error);
-                    }
-
-                    $sql = "SELECT product_id, product_name, supplier_id, category_id, price FROM Products";
-                    $product_result = $conn->query($sql);
-                    if ($product_result->num_rows > 0) {
-                        while($product_row = $product_result->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>".$product_row["product_id"]."</td>";
-                            echo "<td>".$product_row["product_name"]."</td>";
-                            echo "<td>".$product_row["supplier_id"]."</td>";
-                            echo "<td>".$product_row["category_id"]."</td>";
-                            echo "<td>".$product_row["price"]."</td>";
-                            echo "<td>".
-                            "<button>Edit</button>" 
-                            ."<button>Delete</button>".
-                            "</td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='5'>No products found</td></tr>";
-                    }
-                    $conn->close();
-                ?>
-        </table>
-    </div>
-
-    <div id="suppliers" style="display:none;">
-       
-        <table id="supplierTable">
-                <tr>
-                    <th>SUPPLIER ID</th>
-                    <th>SUPPLIER NAME</th>
-                    <th>CONTACT PERSON</th>
-                    <th>CONTACT NUMBER</th>
-                    <th>ACTIONS</th>
-                </tr>
-                <?php
-                    $servername = "127.0.0.1";
-                    $username = "root";
-                    $password = "";
-                    $dbname = "project";
-                    $conn = new mysqli($servername, $username, $password, $dbname);
-                    if ($conn->connect_error) {
-                        die("Connection failed: " . $conn->connect_error);
-                    }
-
-                    $sql = "SELECT supplier_id, supplier_name, contact_person, contact_number FROM Supplier";
-                    $supplier_result = $conn->query($sql);
-                    if ($supplier_result->num_rows > 0) {
-                        while($supplier_row = $supplier_result->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>".$supplier_row["supplier_id"]."</td>";
-                            echo "<td>".$supplier_row["supplier_name"]."</td>";
-                            echo "<td>".$supplier_row["contact_person"]."</td>";
-                            echo "<td>".$supplier_row["contact_number"]."</td>";
-                            echo "<td>".
-                            "<button>Edit</button>" 
-                            ."<button>Delete</button>".
-                            "</td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='4'>No suppliers found</td></tr>";
-                    }
-                    $conn->close();
-                ?>
-
-        </table>
-    </div>
-</d>
-
-    <script>
-        document.getElementById("selection").addEventListener("change", function() {
-            var selectedOption = this.value;
-            document.getElementById("all").style.display = (selectedOption === "all") ? "block" : "none";
-            document.getElementById("categories").style.display = (selectedOption === "categories") ? "block" : "none";
-            document.getElementById("products").style.display = (selectedOption === "products") ? "block" : "none";
-            document.getElementById("suppliers").style.display = (selectedOption === "suppliers") ? "block" : "none";
-        });
-
-        document.getElementById("search_button").addEventListener("click", function() {
-            var searchTerm = document.getElementById("search_term").value.toLowerCase();
-            var selectedOption = document.getElementById("selection").value;
-
-            function filterTable(tableId, columns) {
-                var table, tr, td, i, txtValue, shouldDisplay;
-                table = document.getElementById(tableId);
-                tr = table.getElementsByTagName("tr");
-                for (i = 1; i < tr.length; i++) {
-                    shouldDisplay = false;
-                    for (var j = 0; j < columns.length; j++) {
-                        td = tr[i].getElementsByTagName("td")[columns[j]];
-                        if (td) {
-                            txtValue = td.textContent || td.innerText;
-                            if (txtValue.toLowerCase().indexOf(searchTerm) > -1) {
-                                shouldDisplay = true;
-                                break;
-                            }
-                        }
-                    }
-                    tr[i].style.display = shouldDisplay ? "" : "none";
-                }
-            }
-
-            if (selectedOption === "all") {
-                filterTable("allTable", [0, 2, 4]); // Filter by Category ID, Product ID, Supplier ID in "All" table
-            } else if (selectedOption === "categories") {
-                filterTable("categoryTable", [0]); // Filter by Category ID in "Categories" table
-            } else if (selectedOption === "products") {
-                filterTable("productTable", [0]); // Filter by Product ID in "Products" table
-            } else if (selectedOption === "suppliers") {
-                filterTable("supplierTable", [0]); // Filter by Supplier ID in "Suppliers" table
-            }
-        });
-
-        document.getElementById("search_button").addEventListener("click", function() {
-    var searchTerm = document.getElementById("search_term").value.toLowerCase();
-    var selectedOption = document.getElementById("selection").value;
-
-    function filterTable(tableId, columns) {
-        var table, tr, td, i, txtValue, shouldDisplay;
-        table = document.getElementById(tableId);
-        tr = table.getElementsByTagName("tr");
-        for (i = 1; i < tr.length; i++) {
-            shouldDisplay = false;
-            for (var j = 0; j < columns.length; j++) {
-                td = tr[i].getElementsByTagName("td")[columns[j]];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toLowerCase().indexOf(searchTerm) > -1) {
-                        shouldDisplay = true;
-                        break;
-                    }
-                }
-            }
-            tr[i].style.display = shouldDisplay ? "" : "none";
-        }
-    }
-    if (selectedOption === "all") {
-        filterTable("allTable", [0, 2, 4]); 
-    } else if (selectedOption === "categories") {
-        filterTable("categoryTable", [0]); 
-    } else if (selectedOption === "products") {
-        filterTable("productTable", [0]); 
-    } else if (selectedOption === "suppliers") {
-        filterTable("supplierTable", [0]); 
-    }
-    document.getElementById("search_term").value = "";
-});
-
-    </script>
 
 </body>
 </html>
