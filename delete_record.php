@@ -72,7 +72,7 @@ $stmt->bind_param('s', $id); // Assuming ID is an integer
 if ($stmt->execute()) {
     echo json_encode(['success' => true, 'message' => 'Record deleted successfully']);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Cannot delete record because it is associated with other records.']);
+    echo json_encode(['success' => false, 'message' => 'Failed to delete record']);
 }
 
 $stmt->close();
