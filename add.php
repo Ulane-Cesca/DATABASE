@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE-edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add Form</title>
   <script defer src="app.js"></script>
   <style>
-    @import url('https:/fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+    @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
    body {
       background-color: #a1c398;
    }
@@ -219,8 +219,7 @@
     align-items: center;
     font-size: 20px;
     font-weight: bold;
-    text-indent: -110px;
-    position: left;
+    position: relative; /* Corrected position value */
 }
 .header p img  {
     margin-top: auto;
@@ -228,7 +227,6 @@
     margin-right: 100px;
     height: 70px;
     width: 70px;
-    position: left;
 }
 
 .header a{
@@ -278,10 +276,10 @@
     </div>   
   </div>
   <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $servername = "localhost";
-    $username = "root"; 
-    $password = ""; 
+    $username = "root";
+    $password = "";
     $dbname = "project";
 
     // Create connection
@@ -301,36 +299,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $price = $_POST['price'];
         $supplier_id = $_POST['supplier_id']; // New field
 
-        // Check if category_id exists
-        $check_category_sql = "SELECT * FROM category WHERE category_id = '$category_id'";
-        $check_category_result = $conn->query($check_category_sql);
-
-        if ($check_category_result->num_rows == 0) {
-            // Category ID doesn't exist, alert and halt
-            echo '<script>alert("Category ID does not exist.");</script>';
+        // Validate input
+        if (empty($category_id) || empty($category_name) || empty($product_id) || empty($product_name) || empty($price) || empty($supplier_id)) {
+            echo '<script>alert("All fields are required.");</script>';
         } else {
-            // Category ID exists, check category name spelling
-            $category_row = $check_category_result->fetch_assoc();
-            if ($category_row['category_name'] != $category_name) {
-                // Wrong spelling in category name, alert and halt
-                echo '<script>alert("Wrong spelling in category name.");</script>';
+            // Check if product_id already exists in the category
+            $check_product_sql = "SELECT * FROM products WHERE product_id = ? AND category_id = ?";
+            $check_product_stmt = $conn->prepare($check_product_sql);
+            $check_product_stmt->bind_param("ss", $product_id, $category_id);
+            $check_product_stmt->execute();
+            $check_product_result = $check_product_stmt->get_result();
+
+            if ($check_product_result->num_rows > 0) {
+                // Product already exists in the category
+                echo '<script>alert("Product already exists in the category.");</script>';
             } else {
-                // Check if product_id already exists in the category
-                $check_product_sql = "SELECT * FROM products WHERE product_id = '$product_id' AND category_id = '$category_id'";
-                $check_product_result = $conn->query($check_product_sql);
-
-                if ($check_product_result->num_rows > 0) {
-                    // Product already exists in the category, alert and halt
-                    echo '<script>alert("Product already exists in the category.");</script>';
+                // Insert product into the database
+                $sql = "INSERT INTO products (product_id, product_name, category_id, price, supplier_id) VALUES (?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("sssss", $product_id, $product_name, $category_id, $price, $supplier_id);
+                if ($stmt->execute()) {
+                    echo '<script>alert("Product Added Successfully.");</script>';
                 } else {
-                    // Insert product into the database
-                    $sql = "INSERT INTO products (product_id, product_name, category_id, price, supplier_id) VALUES ('$product_id', '$product_name', '$category_id', '$price', '$supplier_id')"; // Updated SQL query
-
-                    if ($conn->query($sql) === TRUE) {
-                        echo '<script>alert("Product Added Successfully.");</script>';
-                    } else {
-                        echo '<script>alert("Error: ' . $conn->error . '");</script>';
-                    }
+                    echo '<script>alert("Error: ' . $conn->error . '");</script>';
                 }
             }
         }
@@ -342,31 +333,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $supplier_name = $_POST['supplier_name'];
         $contact_person = $_POST['contact_person'];
         $contact_number = $_POST['contact_number'];
-        $password = $supplier_name;
 
-        // Check if supplier_id already exists
-        $check_supplier_sql = "SELECT * FROM supplier WHERE supplier_id = '$supplier_id'";
-        $check_supplier_result = $conn->query($check_supplier_sql);
-
-        if ($check_supplier_result->num_rows > 0) {
-            echo '<script>alert("Supplier ID already exists.");</script>';
+        // Validate input
+        if (empty($supplier_id) || empty($supplier_name) || empty($contact_person) || empty($contact_number)) {
+            echo '<script>alert("All fields are required.");</script>';
         } else {
-            // Insert supplier into the database
-            $sql = "INSERT INTO supplier (supplier_id, supplier_name, contact_person, contact_number, password) VALUES ('$supplier_id', '$supplier_name', '$contact_person', '$contact_number', '$password')";
+            // Check if supplier_id already exists
+	          $supplier_id = mysqli_real_escape_string($conn, $supplier_id);
+            $check_supplier_sql = "SELECT * FROM supplier WHERE supplier_id = '$supplier_id'";
+            $check_supplier_result = $conn->query($check_supplier_sql);
 
-            if ($conn->query($sql) === TRUE) {
-                echo '<script>alert("Supplier Added Successfully.");</script>';
+            if ($check_supplier_result->num_rows > 0) {
+                echo '<script>alert("Supplier with ID exists.");</script>';
             } else {
-                echo '<script>alert("Error: ' . $conn->error . '");</script>';
+              $cs_sql = "SELECT * FROM supplier WHERE supplier_name = '$supplier_name' AND contact_person = '$contact_person' AND contact_number = '$contact_number'";
+              $cs_sql_res = $conn_query($cs_sql);
+
+              if ($cs_sql_res->num_rows > 0){
+                echo '<script>alert("Entry with same supplier name, contact person, and contact number already exists.");</script>';
+              } else {
+                // Insert supplier into the database
+                $sql = "INSERT INTO supplier (supplier_id, supplier_name, contact_person, contact_number) VALUES (?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ssss", $supplier_id, $supplier_name, $contact_person, $contact_number);
+                if ($stmt->execute()) {
+                    echo '<script>alert("Supplier Added Successfully.");</script>';
+                } else {
+                    echo '<script>alert("Error: ' . $conn->error . '");</script>';
+                }
+              }
             }
-        }
-    }
+          }
+      }
 
     $conn->close();
 }
 ?>
-
-
 
 </body>
 </html>
