@@ -1,5 +1,7 @@
 <?php
-$servername = "127.0.0.1";
+header('Content-Type: application/json');
+
+$servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "project";
@@ -7,34 +9,34 @@ $dbname = "project";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die(json_encode(['success' => false, 'message' => 'Database connection failed']));
 }
 
 $data = json_decode(file_get_contents('php://input'), true);
 $table = $data['table'];
 $id = $data['id'];
-$updateData = $data['data'];
+$updatedData = $data['data'];
 
-switch ($table) {
-    case 'products':
-        $query = "UPDATE product SET product_id=?, location=? WHERE product_id=?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param('sssssss',$updateData['product_id'], $updateData['product_name'],$updateData['supplier_id'],$updateData['category_id'],$updateData['price'], $id);
-        break;
-    case 'category':
-        $query = "UPDATE category SET category_id=?, location=? WHERE category_id=?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param('sss', $updateData['category_id'], $updateData['category_name'], $id);
-        break;
-    case 'supplier':
-        $query = "UPDATE supplier SET supplier_id=?, location=? WHERE supplier_id=?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param('sss', $updateData['supplier_id'], $updateData['supplier_name'],$updateData['contact_person'],$updateData['category_id'],$updateData['contact_number'], $id);
-        break;
-    default:
-        echo json_encode(['success' => false, 'message' => 'Invalid table']);
-        exit;
+$valid_tables = ['products', 'category', 'supplier'];
+if (!in_array($table, $valid_tables)) {
+    die(json_encode(['success' => false, 'message' => 'Invalid table']));
 }
+
+$setParts = [];
+$values = [];
+foreach ($updatedData as $key => $value) {
+    $setParts[] = "$key = ?";
+    $values[] = $value;
+}
+$values[] = $id;
+
+$setString = implode(', ', $setParts);
+$id_column = ($table == 'products') ? 'product_id' : ($table == 'category' ? 'category_id' : 'supplier_id');
+$query = "UPDATE $table SET $setString WHERE $id_column = ?";
+$stmt = $conn->prepare($query);
+
+$types = str_repeat('s', count($values) - 1) . 's';
+$stmt->bind_param($types, ...$values);
 
 if ($stmt->execute()) {
     echo json_encode(['success' => true]);
@@ -42,5 +44,6 @@ if ($stmt->execute()) {
     echo json_encode(['success' => false, 'message' => 'Update failed']);
 }
 
+$stmt->close();
 $conn->close();
 ?>

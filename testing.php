@@ -8,48 +8,39 @@
         body {
             font-family: Arial, sans-serif;
         }
-
         .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
-
         .title {
             text-align: center;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
-
         th {
             background-color: #f2f2f2;
         }
-
         .form-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
         .form-controls div {
             margin: 10px 0;
         }
-
         .pagination-container {
             text-align: center;
             margin-top: 20px;
         }
-
         .pagination-container a {
             margin: 0 5px;
             padding: 8px 16px;
@@ -57,12 +48,10 @@
             border: 1px solid #ddd;
             color: #000;
         }
-
         .pagination-container a.active {
             background-color: #4CAF50;
             color: white;
         }
-
         .modal {
             display: none;
             position: fixed;
@@ -76,7 +65,6 @@
             background-color: rgba(0, 0, 0, 0.4);
             padding-top: 60px;
         }
-
         .modal-content {
             background-color: #fefefe;
             margin: 5% auto;
@@ -84,14 +72,12 @@
             border: 1px solid #888;
             width: 80%;
         }
-
         .close {
             color: #aaa;
             float: right;
             font-size: 28px;
             font-weight: bold;
         }
-
         .close:hover,
         .close:focus {
             color: black;
@@ -99,86 +85,58 @@
             cursor: pointer;
         }
     </style>
-        <script>
-    function changePage(table, page) {
-        document.querySelector(`input[name="${table}_page"]`).value = page;
-        document.getElementById('tableForm').submit();
-    }
+    <script>
+        function changePage(table, page) {
+            document.querySelector(`input[name="${table}_page"]`).value = page;
+            document.getElementById('tableForm').submit();
+        }
 
-    function editRecord(table, id) {
-        fetch(`fetch_record.php?table=${table}&id=${id}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const form = document.getElementById('editForm');
-                    form.innerHTML = '';
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
 
-                    Object.keys(data.record).forEach(key => {
-                        const value = data.record[key];
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.name = key;
-                        input.value = value;
-                        input.placeholder = key;
-                        form.appendChild(input);
-                    });
+        function editRecord(table, id) {
+            fetch(`fetch_record.php?table=${table}&id=${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const record = data.record;
+                        const form = document.getElementById('editForm');
+                        form.innerHTML = '';
 
-                    const submitButton = document.createElement('button');
-                    submitButton.type = 'submit';
-                    submitButton.textContent = 'Save Changes';
-                    form.appendChild(submitButton);
+                        if (table === 'products') {
+                            form.innerHTML += `<div class="input-container"><label class="small-label">Product ID</label><input type="text" name="product_id" value="${record.product_id}" disabled></div>`;
+                            form.innerHTML += `<div class="input-container"><label class="small-label">Product Name</label><input type="text" name="product_name" value="${record.product_name}"></div>`;
+                            form.innerHTML += `<div class="input-container"><label class="small-label">Supplier ID</label><input type="text" name="supplier_id" value="${record.supplier_id}" disabled></div>`;
+                            form.innerHTML += `<div class="input-container"><label class="small-label">Category ID</label><input type="text" name="category_id" value="${record.category_id}" disabled></div>`;
+                            form.innerHTML += `<div class="input-container"><label class="small-label">Price</label><input type="text" name="price" value="${record.price}"></div>`;
+                        } else if (table === 'category') {
+                            form.innerHTML += `<div class="input-container"><label class="small-label">Category ID</label><input type="text" name="category_id" value="${record.category_id}" disabled></div>`;
+                            form.innerHTML += `<div class="input-container"><label class="small-label">Category Name</label><input type="text" name="category_name" value="${record.category_name}"></div>`;
+                        } else if (table === 'supplier') {
+                            form.innerHTML += `<div class="input-container"><label class="small-label">Supplier ID</label><input type="text" name="supplier_id" value="${record.supplier_id}" disabled></div>`;
+                            form.innerHTML += `<div class="input-container"><label class="small-label">Supplier Name</label><input type="text" name="supplier_name" value="${record.supplier_name}"></div>`;
+                            form.innerHTML += `<div class="input-container"><label class="small-label">Contact Person</label><input type="text" name="contact_person" value="${record.contact_person}"></div>`;
+                            form.innerHTML += `<div class="input-container"><label class="small-label">Contact Number</label><input type="text" name="contact_number" value="${record.contact_number}"></div>`;
+                        }
 
-                    document.getElementById('editModal').style.display = 'block';
-                } else {
-                    alert(data.message);
-                }
-            });
-    }
+                        const submitButton = document.createElement('button');
+                        submitButton.type = 'submit';
+                        submitButton.textContent = 'Save';
+                        form.appendChild(submitButton);
 
-    function closeModal() {
-        document.getElementById('editModal').style.display = 'none';
-    }
-    function editRecord(table, id) {
-    fetch(`fetch_record.php?table=${table}&id=${id}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const record = data.record;
-                const form = document.getElementById('editForm');
-                form.innerHTML = '';
+                        form.dataset.table = table;
+                        form.dataset.id = id;
 
-                for (const [key, value] of Object.entries(record)) {
-                    const container = document.createElement('div');
-                    container.classList.add('input-container');
-                    const label = document.createElement('label');
-                    label.textContent = key;
-                    label.classList.add('small-label');
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.name = key;
-                    input.value = value;
-                    container.appendChild(label);
-                    container.appendChild(input);
-                    form.appendChild(container);
-                }
+                        document.getElementById('editModal').style.display = 'block';
+                    } else {
+                        console.error('Error fetching record:', data.error);
+                    }
+                })
+                .catch(error => console.error('Error fetching record:', error));
+        }
 
-                const submitButton = document.createElement('button');
-                submitButton.type = 'submit';
-                submitButton.textContent = 'Save';
-                form.appendChild(submitButton);
-
-                form.dataset.table = table;
-                form.dataset.id = id;
-
-                document.getElementById('editModal').style.display = 'block';
-            } else {
-                console.error('Error fetching record:', data.error);
-            }
-        })
-        .catch(error => console.error('Error fetching record:', error));
-}
-
-    function submitEditForm(event) {
+        function submitEditForm(event) {
             event.preventDefault();
 
             const form = event.target;
@@ -203,7 +161,7 @@
                 if (result.success) {
                     alert('Record updated successfully.');
                     closeModal();
-                    submitForm();
+                    refreshTableData(table);
                 } else {
                     alert('Failed to update record: ' + result.message);
                 }
@@ -213,32 +171,53 @@
                 alert('An error occurred while updating the record.');
             });
         }
-    async function deleteRecord(table, id) {
-    if (confirm("Are you sure you want to delete this record?")) {
-        try {
-            const response = await fetch('delete_record.php', {
+
+        function refreshTableData(table) {
+            const form = document.getElementById('tableForm');
+            const formData = new FormData(form);
+            formData.set('tableSelect', table);
+
+            fetch('testing.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ table, id }) // Sending table and id as JSON data
+                body: formData
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newTable = doc.querySelector('.container').innerHTML;
+                document.querySelector('.container').innerHTML = newTable;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while refreshing the table.');
             });
-            const result = await response.json();
-            if (result.success) {
-                alert('Record deleted successfully.');
-                changePage(table, 1); // Reload the page or update the table after deletion
-            } else {
-                alert('Failed to delete record: ' + result.message);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while deleting the record.');
         }
-    }
-}
 
-</script>
-
+        async function deleteRecord(table, id) {
+            if (confirm("Are you sure you want to delete this record?")) {
+                try {
+                    const response = await fetch('delete_record.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ table, id })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(result.message);
+                        changePage(table, 1);
+                    } else {
+                        alert('Failed to delete record: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the record.');
+                }
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -253,16 +232,22 @@
                 <select id="tableSelect" name="tableSelect" onchange="this.form.submit()">
                     <option value="products" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'products' ? 'selected' : '' ?>>Products</option>
                     <option value="category" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'category' ? 'selected' : '' ?>>Category</option>
-                    <option value="supplier" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'supplier' ? 'selected' : '' ?>>Suppliers</option>
+                    <option value="supplier" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'supplier' ? 'selected' : '' ?>>Supplier</option>
                 </select>
             </div>
-            <input type="hidden" name="products_page" value="<?= $_POST['products_page'] ?? 1 ?>">
-            <input type="hidden" name="category_page" value="<?= $_POST['category_page'] ?? 1 ?>">
-            <input type="hidden" name="supplier_page" value="<?= $_POST['supplier_page'] ?? 1 ?>">
+            <input type="hidden" name="products_page" value="1">
+            <input type="hidden" name="category_page" value="1">
+            <input type="hidden" name="supplier_page" value="1">
         </form>
 
         <?php
-        $conn = new mysqli("127.0.0.1", "root", "", "project");
+        // PHP code to display the table based on the selected category and perform pagination
+        $servername = "localhost";
+        $username = "root";
+        $password = "";
+        $dbname = "project";
+
+        $conn = new mysqli($servername, $username, $password, $dbname);
 
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
@@ -337,7 +322,7 @@
             while ($row = $result->fetch_assoc()) {
                 echo "<tr>";
                 $idKey = '';
-            
+
                 switch ($selectedTable) {
                     case 'products':
                         $idKey = 'product_id';
@@ -352,15 +337,14 @@
                         echo "<td>{$row['supplier_id']}</td><td>{$row['supplier_name']}</td><td>{$row['contact_person']}</td><td>{$row['contact_number']}</td>";
                         break;
                 }
-            
+
                 echo "<td class='action-buttons'>
                 <button onclick=\"editRecord('$selectedTable', '{$row[$idKey]}')\">Edit</button>
-                        <button onclick=\"deleteRecord('$selectedTable', '{$row[$idKey]}')\">Delete</button>
-                      </td>";
-    
+                <button onclick=\"deleteRecord('$selectedTable', '{$row[$idKey]}')\">Delete</button>
+                </td>";
+
                 echo "</tr>";
             }
-            
 
             echo "</table>";
         } else {
@@ -391,6 +375,5 @@
             </div>
         </div>
     </div>
-
 </body>
 </html>
