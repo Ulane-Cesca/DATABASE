@@ -38,7 +38,7 @@ function hasDependencies($conn, $table, $id) {
             return false;
     }
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('i', $id);
+    $stmt->bind_param('s', $id); // Assuming ID is a string
     $stmt->execute();
     $result = $stmt->get_result();
     $count = $result->fetch_assoc()['count'];
@@ -67,7 +67,7 @@ switch ($table) {
 }
 
 $stmt = $conn->prepare($query);
-$stmt->bind_param('s', $id); // Assuming ID is an integer
+$stmt->bind_param('s', $id); // Assuming ID is a string
 
 if ($stmt->execute()) {
     echo json_encode(['success' => true, 'message' => 'Record deleted successfully']);
