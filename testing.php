@@ -2,16 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Inventory Management</title>
+    <title>Information</title>
     <link rel="stylesheet" href="style.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'poppins', sans-serif;
+            margin-bottom: 50px;
         }
         .container {
-            max-width: 800px;
+            max-width: 90%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
         }
         .title {
             text-align: center;
@@ -19,27 +20,53 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
             text-align: left;
         }
         th {
             background-color: #f2f2f2;
+            padding: 8px;
+        }
+        .container h2 {
+             justify-content: center;
+             display: flex;
+             margin-top: 10px;
+             margin-bottom: -5px;
+             align-items: center;
+             margin-left: 10px;
+        }
+        .container h2 img {
+            height: 13px;
+            width: 15px;
+            position: relative;
+            margin-top: auto;
+            margin-top: -10px;
+            margin-left: 5px;
+        }
+        .container label {
+            flex: 0 0 100px; /* Sets a fixed width for the label */
+            margin-right: 0; 
+            text-align: right;
+            padding: 5px;
+            border-radius: 15px;
         }
         .form-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-left: 250%;
         }
         .form-controls div {
             margin: 10px 0;
         }
         .pagination-container {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            margin-left: 43%;
         }
         .pagination-container a {
             margin: 0 5px;
@@ -52,6 +79,21 @@
             background-color: #4CAF50;
             color: white;
         }
+        .modal-content form div {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .modal-content form div label {
+            margin-right: 10px;
+            margin-left: 30px;
+            width: 30%;
+            text-align: left;
+        }
+        .modal-content form div input,
+        .modal-content form div select {
+            flex: 1;
+        }
         .modal {
             display: none;
             position: fixed;
@@ -61,22 +103,66 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgb(0, 0, 0);
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(0,0,0,0.4);
             padding-top: 60px;
         }
         .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
+            background-color: #FFA2B9;
+            color: black;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 30%;
             padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
+        }
+        .modal-content h2 {
+            text-align: center;
+        }
+        .modal-content button[type="submit"] {
+            margin: 20px 20px 0 60%;
+            background-color: #a1c398;
+            border: none;
+            color: black;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 15px;
+            height: 30px;
+            width: 40%;
+            cursor: pointer;
+            float: right;
+        }
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-content form div {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+        .modal-content form div label {
+            margin-right: 10px;
+        }
+        .modal-content form div input {
+            margin-left: 10px;
+            width: 50%;
+        }
+        .modal-content form div select {
+            margin-left: 10px;
+            width: 52%;
         }
         .close {
             color: #aaa;
-            float: right;
+            position: absolute;
+            top: 10px;
+            right: 10px;
             font-size: 28px;
             font-weight: bold;
+            cursor: pointer;
         }
         .close:hover,
         .close:focus {
@@ -105,21 +191,20 @@
                         form.innerHTML = '';
 
                         if (table === 'products') {
-                            form.innerHTML += `<div class="input-container"><label class="small-label">Product ID</label><input type="text" name="product_id" value="${record.product_id}" disabled></div>`;
-                            form.innerHTML += `<div class="input-container"><label class="small-label">Product Name</label><input type="text" name="product_name" value="${record.product_name}"></div>`;
-                            form.innerHTML += `<div class="input-container"><label class="small-label">Supplier ID</label><input type="text" name="supplier_id" value="${record.supplier_id}" disabled></div>`;
-                            form.innerHTML += `<div class="input-container"><label class="small-label">Category ID</label><input type="text" name="category_id" value="${record.category_id}" disabled></div>`;
-                            form.innerHTML += `<div class="input-container"><label class="small-label">Price</label><input type="text" name="price" value="${record.price}"></div>`;
+                            form.innerHTML += `<div class="input-container_3"><label class="small-label">Product ID: </label><input type="text" name="product_id" value="${record.product_id}" disabled></div>`;
+                            form.innerHTML += `<div class="input-container_3"><label class="small-label">Product Name: </label><input type="text" name="product_name" value="${record.product_name}"></div>`;
+                            form.innerHTML += `<div class="input-container_3"><label class="small-label">Supplier ID: </label><input type="text" name="supplier_id" value="${record.supplier_id}" disabled></div>`;
+                            form.innerHTML += `<div class="input-container_3"><label class="small-label">Category ID: </label><input type="text" name="category_id" value="${record.category_id}" disabled></div>`;
+                            form.innerHTML += `<div class="input-container_3"><label class="small-label">Price: </label><input type="text" name="price" value="${record.price}"></div>`;
                         } else if (table === 'category') {
-                            form.innerHTML += `<div class="input-container"><label class="small-label">Category ID</label><input type="text" name="category_id" value="${record.category_id}" disabled></div>`;
-                            form.innerHTML += `<div class="input-container"><label class="small-label">Category Name</label><input type="text" name="category_name" value="${record.category_name}"></div>`;
+                            form.innerHTML += `<div class="input-container_3"><label class="small-label">Category ID: </label><input type="text" name="category_id" value="${record.category_id}" disabled></div>`;
+                            form.innerHTML += `<div class="input-container_3"><label class="small-label">Category Name: </label><input type="text" name="category_name" value="${record.category_name}"></div>`;
                         } else if (table === 'supplier') {
-                            form.innerHTML += `<div class="input-container"><label class="small-label">Supplier ID</label><input type="text" name="supplier_id" value="${record.supplier_id}" disabled></div>`;
-                            form.innerHTML += `<div class="input-container"><label class="small-label">Supplier Name</label><input type="text" name="supplier_name" value="${record.supplier_name}"></div>`;
-                            form.innerHTML += `<div class="input-container"><label class="small-label">Contact Person</label><input type="text" name="contact_person" value="${record.contact_person}"></div>`;
-                            form.innerHTML += `<div class="input-container"><label class="small-label">Contact Number</label><input type="text" name="contact_number" value="${record.contact_number}"></div>`;
+                            form.innerHTML += `<div class="input-container_3"><label class="small-label">Supplier ID: </label><input type="text" name="supplier_id" value="${record.supplier_id}" disabled></div>`;
+                            form.innerHTML += `<div class="input-container_3"><label class="small-label">Supplier Name: </label><input type="text" name="supplier_name" value="${record.supplier_name}"></div>`;
+                            form.innerHTML += `<div class="input-container_3"><label class="small-label">Contact Person: </label><input type="text" name="contact_person" value="${record.contact_person}"></div>`;
+                            form.innerHTML += `<div class="input-container_3"><label class="small-label">Contact Number: </label><input type="text" name="contact_number" value="${record.contact_number}"></div>`;
                         }
-
                         const submitButton = document.createElement('button');
                         submitButton.type = 'submit';
                         submitButton.textContent = 'Save';
@@ -220,20 +305,29 @@
     </script>
 </head>
 <body>
+    <div class="header">
+        <p><img src="l2.png" alt="Logo"><a href="home.php">SADE GROCERY</a></p>
+    </div>
+
     <div class="container">
-        <h1 class="title">Inventory Management</h1>
+        <h2>Information<a href="add.php">
+            <img src="add.png" alt="Icon" width="45" height="35" class="icon">
+        </a></h2>
+
         <form id="tableForm" method="POST" action="">
             <div class="form-controls">
+                <label for="tableSelect">Type: </label>
+                <select id="tableSelect" name="tableSelect" onchange="this.form.submit()">
+                    <option value="all" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'all' ? 'selected' : '' ?>>All</option>
+                    <option value="products" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'products' ? 'selected' : '' ?>>Products</option>
+                    <option value="category" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'category' ? 'selected' : '' ?>>Category</option>
+                    <option value="supplier" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'supplier' ? 'selected' : '' ?>>Supplier</option>
+                </select>
                 <div class="buttons">
                     <div>
                         <input type="text" name="searchID" placeholder="Search by ID" value="<?= htmlspecialchars($_POST['searchID'] ?? '') ?>" onkeydown="if (event.key === 'Enter') { this.form.submit(); return false; }">
                     </div>
                 </div>
-                <select id="tableSelect" name="tableSelect" onchange="this.form.submit()">
-                    <option value="products" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'products' ? 'selected' : '' ?>>Products</option>
-                    <option value="category" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'category' ? 'selected' : '' ?>>Category</option>
-                    <option value="supplier" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'supplier' ? 'selected' : '' ?>>Supplier</option>
-                </select>
             </div>
             <input type="hidden" name="products_page" value="1">
             <input type="hidden" name="category_page" value="1">
@@ -253,7 +347,7 @@
             die("Connection failed: " . $conn->connect_error);
         }
 
-        $selectedTable = $_POST['tableSelect'] ?? 'products';
+        $selectedTable = $_POST['tableSelect'] ?? 'all';
         $searchID = $_POST['searchID'] ?? '';
 
         $limit = 10;
@@ -291,6 +385,17 @@
                 $sql = "SELECT * FROM supplier WHERE supplier_id LIKE '%$searchID%' LIMIT $limit OFFSET $offset";
                 $countSql = "SELECT COUNT(*) AS count FROM supplier WHERE supplier_id LIKE '%$searchID%'";
                 break;
+            case 'all':
+                $sql = "SELECT c.category_id, c.category_name, p.supplier_id, s.supplier_name, s.contact_person, s.contact_number, p.product_id, p.product_name, p.price
+                        FROM category c 
+                        JOIN products p ON c.category_id = p.category_id 
+                        JOIN supplier s ON p.supplier_id = s.supplier_id 
+                        WHERE c.category_id LIKE '%$searchID%' OR p.product_id LIKE '%$searchID%' OR s.supplier_id LIKE '%$searchID%' LIMIT $limit OFFSET $offset";
+                $countSql = "SELECT COUNT(*) AS count FROM category c 
+                            JOIN products p ON c.category_id = p.category_id 
+                            JOIN supplier s ON p.supplier_id = s.supplier_id 
+                            WHERE c.category_id LIKE '%$searchID%' OR p.product_id LIKE '%$searchID%' OR s.supplier_id LIKE '%$searchID%'";
+                break;
             default:
                 $sql = "SELECT * FROM products LIMIT $limit OFFSET $offset";
                 $countSql = "SELECT COUNT(*) AS count FROM products";
@@ -305,43 +410,59 @@
             echo "<table>";
             echo "<tr>";
 
-            switch ($selectedTable) {
-                case 'products':
-                    echo "<th>Product ID</th><th>Product Name</th><th>Supplier ID</th><th>Category ID</th><th>Price</th><th>Actions</th>";
-                    break;
-                case 'category':
-                    echo "<th>Category ID</th><th>Category Name</th><th>Actions</th>";
-                    break;
-                case 'supplier':
-                    echo "<th>Supplier ID</th><th>Supplier Name</th><th>Contact Person</th><th>Contact Number</th><th>Actions</th>";
-                    break;
+            if ($selectedTable == 'all') {
+                echo "<th>Category ID</th><th>Category Name</th><th>Supplier ID</th><th>Supplier Name</th><th>Contact Person</th><th>Contact Number</th><th>Product ID</th><th>Product Name</th><th>Price</th>";
+            } else {
+                switch ($selectedTable) {
+                    case 'products':
+                        echo "<th>Product ID</th><th>Product Name</th><th>Supplier ID</th><th>Category ID</th><th>Price</th><th>Actions</th>";
+                        break;
+                    case 'category':
+                        echo "<th>Category ID</th><th>Category Name</th><th>Actions</th>";
+                        break;
+                    case 'supplier':
+                        echo "<th>Supplier ID</th><th>Supplier Name</th><th>Contact Person</th><th>Contact Number</th><th>Actions</th>";
+                        break;
+                }
             }
 
             echo "</tr>";
 
             while ($row = $result->fetch_assoc()) {
                 echo "<tr>";
-                $idKey = '';
 
-                switch ($selectedTable) {
-                    case 'products':
-                        $idKey = 'product_id';
-                        echo "<td>{$row['product_id']}</td><td>{$row['product_name']}</td><td>{$row['supplier_id']}</td><td>{$row['category_id']}</td><td>{$row['price']}</td>";
-                        break;
-                    case 'category':
-                        $idKey = 'category_id';
-                        echo "<td>{$row['category_id']}</td><td>{$row['category_name']}</td>";
-                        break;
-                    case 'supplier':
-                        $idKey = 'supplier_id';
-                        echo "<td>{$row['supplier_id']}</td><td>{$row['supplier_name']}</td><td>{$row['contact_person']}</td><td>{$row['contact_number']}</td>";
-                        break;
+                if ($selectedTable == 'all') {
+                    echo "<td>{$row['category_id']}</td><td>{$row['category_name']}</td><td>{$row['supplier_id']}</td><td>{$row['supplier_name']}</td><td>{$row['contact_person']}</td><td>{$row['contact_number']}</td><td>{$row['product_id']}</td><td>{$row['product_name']}</td><td>{$row['price']}</td>";
+                } else {
+                    $idKey = '';
+
+                    switch ($selectedTable) {
+                        case 'products':
+                            $idKey = 'product_id';
+                            echo "<td>{$row['product_id']}</td><td>{$row['product_name']}</td><td>{$row['supplier_id']}</td><td>{$row['category_id']}</td><td>{$row['price']}</td>";
+                            echo "<td class='action-buttons'>
+                            <button onclick=\"editRecord('$selectedTable', '{$row[$idKey]}')\">Edit</button>
+                            <button onclick=\"deleteRecord('$selectedTable', '{$row[$idKey]}')\">Delete</button>
+                            </td>";
+                            break;
+                        case 'category':
+                            $idKey = 'category_id';
+                            echo "<td>{$row['category_id']}</td><td>{$row['category_name']}</td>";
+                            echo "<td class='action-buttons'>
+                            <button onclick=\"editRecord('$selectedTable', '{$row[$idKey]}')\">Edit</button>
+                            <button onclick=\"deleteRecord('$selectedTable', '{$row[$idKey]}')\">Delete</button>
+                            </td>";
+                            break;
+                        case 'supplier':
+                            $idKey = 'supplier_id';
+                            echo "<td>{$row['supplier_id']}</td><td>{$row['supplier_name']}</td><td>{$row['contact_person']}</td><td>{$row['contact_number']}</td>";
+                            echo "<td class='action-buttons'>
+                            <button onclick=\"editRecord('$selectedTable', '{$row[$idKey]}')\">Edit</button>
+                            <button onclick=\"deleteRecord('$selectedTable', '{$row[$idKey]}')\">Delete</button>
+                            </td>";
+                            break;
+                    }
                 }
-
-                echo "<td class='action-buttons'>
-                <button onclick=\"editRecord('$selectedTable', '{$row[$idKey]}')\">Edit</button>
-                <button onclick=\"deleteRecord('$selectedTable', '{$row[$idKey]}')\">Delete</button>
-                </td>";
 
                 echo "</tr>";
             }

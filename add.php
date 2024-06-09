@@ -342,6 +342,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $supplier_name = $_POST['supplier_name'];
         $contact_person = $_POST['contact_person'];
         $contact_number = $_POST['contact_number'];
+        $password = $supplier_name;
 
         // Check if supplier_id already exists
         $check_supplier_sql = "SELECT * FROM supplier WHERE supplier_id = '$supplier_id'";
@@ -351,7 +352,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo '<script>alert("Supplier ID already exists.");</script>';
         } else {
             // Insert supplier into the database
-            $sql = "INSERT INTO supplier (supplier_id, supplier_name, contact_person, contact_number) VALUES ('$supplier_id', '$supplier_name', '$contact_person', '$contact_number')";
+            $sql = "INSERT INTO supplier (supplier_id, supplier_name, contact_person, contact_number, password) VALUES ('$supplier_id', '$supplier_name', '$contact_person', '$contact_number', '$password')";
 
             if ($conn->query($sql) === TRUE) {
                 echo '<script>alert("Supplier Added Successfully.");</script>';
