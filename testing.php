@@ -2,16 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Inventory Management</title>
+    <title>Information</title>
     <link rel="stylesheet" href="style.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'poppins', sans-serif;
+            margin-bottom: 50px;
         }
         .container {
-            max-width: 800px;
+            max-width: 90%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
         }
         .title {
             text-align: center;
@@ -19,20 +20,44 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 7px;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
             text-align: left;
         }
         th {
             background-color: #f2f2f2;
+            padding: 8px;
+        }
+        .container h2 {
+             justify-content: center;
+             display: flex;
+             margin-top: 10px;
+             margin-bottom: -17px;
+             align-items: center;
+             margin-left: 10px;
+        }
+        .container h2 img {
+            height: 13px;
+            width: 15px;
+            position: relative;
+            margin-top: auto;
+            margin-top: -10px;
+            margin-left: 5px;
+        }
+        .container label {
+            flex: 0 0 100px; /* Sets a fixed width for the label */
+            margin-right: 0; 
+            text-align: right;
+            padding: 5px;
+            border-radius: 15px;
         }
         .form-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-left: 290%;
         }
         .form-controls div {
             margin: 10px 0;
@@ -40,6 +65,9 @@
         .pagination-container {
             text-align: center;
             margin-top: 20px;
+            display: flex;
+            align-items: center;
+            margin-left: 43%;
         }
         .pagination-container a {
             margin: 0 5px;
@@ -220,21 +248,29 @@
     </script>
 </head>
 <body>
+    <div class="header">
+        <p><img src="l2.png" alt="Logo"><a href="home.php">SADE GROCERY</a></p>
+    </div>
+
     <div class="container">
-        <h1 class="title">Inventory Management</h1>
+        <h2>Information<a href="add.php">
+            <img src="add.png" alt="Icon" width="45" height="35" class="icon">
+        </a></h2>
+
         <form id="tableForm" method="POST" action="">
             <div class="form-controls">
-                <div class="buttons">
-                    <div>
-                        <input type="text" name="searchID" placeholder="Search by ID" value="<?= htmlspecialchars($_POST['searchID'] ?? '') ?>" onkeydown="if (event.key === 'Enter') { this.form.submit(); return false; }">
-                    </div>
-                </div>
+                <label for="tableSelect">Type: </label>
                 <select id="tableSelect" name="tableSelect" onchange="this.form.submit()">
                     <option value="all" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'all' ? 'selected' : '' ?>>All</option>
                     <option value="products" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'products' ? 'selected' : '' ?>>Products</option>
                     <option value="category" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'category' ? 'selected' : '' ?>>Category</option>
                     <option value="supplier" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'supplier' ? 'selected' : '' ?>>Supplier</option>
                 </select>
+                <div class="buttons">
+                    <div>
+                        <input type="text" name="searchID" placeholder="Search by ID" value="<?= htmlspecialchars($_POST['searchID'] ?? '') ?>" onkeydown="if (event.key === 'Enter') { this.form.submit(); return false; }">
+                    </div>
+                </div>
             </div>
             <input type="hidden" name="products_page" value="1">
             <input type="hidden" name="category_page" value="1">
