@@ -230,6 +230,7 @@
                     </div>
                 </div>
                 <select id="tableSelect" name="tableSelect" onchange="this.form.submit()">
+                    <option value="all" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'all' ? 'selected' : '' ?>>All</option>
                     <option value="products" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'products' ? 'selected' : '' ?>>Products</option>
                     <option value="category" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'category' ? 'selected' : '' ?>>Category</option>
                     <option value="supplier" <?= isset($_POST['tableSelect']) && $_POST['tableSelect'] == 'supplier' ? 'selected' : '' ?>>Supplier</option>
@@ -253,7 +254,7 @@
             die("Connection failed: " . $conn->connect_error);
         }
 
-        $selectedTable = $_POST['tableSelect'] ?? 'products';
+        $selectedTable = $_POST['tableSelect'] ?? 'all';
         $searchID = $_POST['searchID'] ?? '';
 
         $limit = 10;
@@ -291,6 +292,17 @@
                 $sql = "SELECT * FROM supplier WHERE supplier_id LIKE '%$searchID%' LIMIT $limit OFFSET $offset";
                 $countSql = "SELECT COUNT(*) AS count FROM supplier WHERE supplier_id LIKE '%$searchID%'";
                 break;
+            case 'all':
+                $sql = "SELECT c.category_id, c.category_name, p.supplier_id, s.supplier_name, s.contact_person, s.contact_number, p.product_id, p.product_name, p.price
+                        FROM category c 
+                        JOIN products p ON c.category_id = p.category_id 
+                        JOIN supplier s ON p.supplier_id = s.supplier_id 
+                        WHERE c.category_id LIKE '%$searchID%' OR p.product_id LIKE '%$searchID%' OR s.supplier_id LIKE '%$searchID%' LIMIT $limit OFFSET $offset";
+                $countSql = "SELECT COUNT(*) AS count FROM category c 
+                            JOIN products p ON c.category_id = p.category_id 
+                            JOIN supplier s ON p.supplier_id = s.supplier_id 
+                            WHERE c.category_id LIKE '%$searchID%' OR p.product_id LIKE '%$searchID%' OR s.supplier_id LIKE '%$searchID%'";
+                break;
             default:
                 $sql = "SELECT * FROM products LIMIT $limit OFFSET $offset";
                 $countSql = "SELECT COUNT(*) AS count FROM products";
@@ -305,43 +317,59 @@
             echo "<table>";
             echo "<tr>";
 
-            switch ($selectedTable) {
-                case 'products':
-                    echo "<th>Product ID</th><th>Product Name</th><th>Supplier ID</th><th>Category ID</th><th>Price</th><th>Actions</th>";
-                    break;
-                case 'category':
-                    echo "<th>Category ID</th><th>Category Name</th><th>Actions</th>";
-                    break;
-                case 'supplier':
-                    echo "<th>Supplier ID</th><th>Supplier Name</th><th>Contact Person</th><th>Contact Number</th><th>Actions</th>";
-                    break;
+            if ($selectedTable == 'all') {
+                echo "<th>Category ID</th><th>Category Name</th><th>Supplier ID</th><th>Supplier Name</th><th>Contact Person</th><th>Contact Number</th><th>Product ID</th><th>Product Name</th><th>Price</th>";
+            } else {
+                switch ($selectedTable) {
+                    case 'products':
+                        echo "<th>Product ID</th><th>Product Name</th><th>Supplier ID</th><th>Category ID</th><th>Price</th><th>Actions</th>";
+                        break;
+                    case 'category':
+                        echo "<th>Category ID</th><th>Category Name</th><th>Actions</th>";
+                        break;
+                    case 'supplier':
+                        echo "<th>Supplier ID</th><th>Supplier Name</th><th>Contact Person</th><th>Contact Number</th><th>Actions</th>";
+                        break;
+                }
             }
 
             echo "</tr>";
 
             while ($row = $result->fetch_assoc()) {
                 echo "<tr>";
-                $idKey = '';
 
-                switch ($selectedTable) {
-                    case 'products':
-                        $idKey = 'product_id';
-                        echo "<td>{$row['product_id']}</td><td>{$row['product_name']}</td><td>{$row['supplier_id']}</td><td>{$row['category_id']}</td><td>{$row['price']}</td>";
-                        break;
-                    case 'category':
-                        $idKey = 'category_id';
-                        echo "<td>{$row['category_id']}</td><td>{$row['category_name']}</td>";
-                        break;
-                    case 'supplier':
-                        $idKey = 'supplier_id';
-                        echo "<td>{$row['supplier_id']}</td><td>{$row['supplier_name']}</td><td>{$row['contact_person']}</td><td>{$row['contact_number']}</td>";
-                        break;
+                if ($selectedTable == 'all') {
+                    echo "<td>{$row['category_id']}</td><td>{$row['category_name']}</td><td>{$row['supplier_id']}</td><td>{$row['supplier_name']}</td><td>{$row['contact_person']}</td><td>{$row['contact_number']}</td><td>{$row['product_id']}</td><td>{$row['product_name']}</td><td>{$row['price']}</td>";
+                } else {
+                    $idKey = '';
+
+                    switch ($selectedTable) {
+                        case 'products':
+                            $idKey = 'product_id';
+                            echo "<td>{$row['product_id']}</td><td>{$row['product_name']}</td><td>{$row['supplier_id']}</td><td>{$row['category_id']}</td><td>{$row['price']}</td>";
+                            echo "<td class='action-buttons'>
+                            <button onclick=\"editRecord('$selectedTable', '{$row[$idKey]}')\">Edit</button>
+                            <button onclick=\"deleteRecord('$selectedTable', '{$row[$idKey]}')\">Delete</button>
+                            </td>";
+                            break;
+                        case 'category':
+                            $idKey = 'category_id';
+                            echo "<td>{$row['category_id']}</td><td>{$row['category_name']}</td>";
+                            echo "<td class='action-buttons'>
+                            <button onclick=\"editRecord('$selectedTable', '{$row[$idKey]}')\">Edit</button>
+                            <button onclick=\"deleteRecord('$selectedTable', '{$row[$idKey]}')\">Delete</button>
+                            </td>";
+                            break;
+                        case 'supplier':
+                            $idKey = 'supplier_id';
+                            echo "<td>{$row['supplier_id']}</td><td>{$row['supplier_name']}</td><td>{$row['contact_person']}</td><td>{$row['contact_number']}</td>";
+                            echo "<td class='action-buttons'>
+                            <button onclick=\"editRecord('$selectedTable', '{$row[$idKey]}')\">Edit</button>
+                            <button onclick=\"deleteRecord('$selectedTable', '{$row[$idKey]}')\">Delete</button>
+                            </td>";
+                            break;
+                    }
                 }
-
-                echo "<td class='action-buttons'>
-                <button onclick=\"editRecord('$selectedTable', '{$row[$idKey]}')\">Edit</button>
-                <button onclick=\"deleteRecord('$selectedTable', '{$row[$idKey]}')\">Delete</button>
-                </td>";
 
                 echo "</tr>";
             }
