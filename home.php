@@ -47,19 +47,19 @@
           <div class="values">
       <div class="val-box">
           <div>
-            <h3>8,267</h3>
+            <h3>55</h3>
             <span>Total Products</span>
           </div>
       </div>
       <div class="val-box">
           <div>
-            <h3>200,521</h3>
+            <h3>25</h3>
             <span>Total Category</span>
           </div>
       </div>
       <div class="val-box">
           <div>
-            <h3>215,542</h3>
+            <h3>50</h3>
             <span>Total Suppliers</span>
           </div>
       </div>

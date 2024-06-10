@@ -224,7 +224,6 @@
 .header p img  {
     margin-top: auto;
     margin-bottom: 10px;
-    margin-right: 100px;
     height: 70px;
     width: 70px;
 }
@@ -333,6 +332,7 @@
         $supplier_name = $_POST['supplier_name'];
         $contact_person = $_POST['contact_person'];
         $contact_number = $_POST['contact_number'];
+        $password = $_POST['supplier_name'];
 
         // Validate input
         if (empty($supplier_id) || empty($supplier_name) || empty($contact_person) || empty($contact_number)) {
@@ -347,15 +347,15 @@
                 echo '<script>alert("Supplier with ID exists.");</script>';
             } else {
               $cs_sql = "SELECT * FROM supplier WHERE supplier_name = '$supplier_name' AND contact_person = '$contact_person' AND contact_number = '$contact_number'";
-              $cs_sql_res = $conn_query($cs_sql);
+              $cs_sql_res = $conn->query($cs_sql);
 
               if ($cs_sql_res->num_rows > 0){
                 echo '<script>alert("Entry with same supplier name, contact person, and contact number already exists.");</script>';
               } else {
                 // Insert supplier into the database
-                $sql = "INSERT INTO supplier (supplier_id, supplier_name, contact_person, contact_number) VALUES (?, ?, ?, ?)";
+                $sql = "INSERT INTO supplier (supplier_id, supplier_name, contact_person, contact_number, password) VALUES (?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssss", $supplier_id, $supplier_name, $contact_person, $contact_number);
+                $stmt->bind_param("sssss", $supplier_id, $supplier_name, $contact_person, $contact_number, $password);
                 if ($stmt->execute()) {
                     echo '<script>alert("Supplier Added Successfully.");</script>';
                 } else {

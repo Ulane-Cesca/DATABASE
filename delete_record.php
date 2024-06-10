@@ -11,7 +11,6 @@ if (!$table || !$id) {
     echo json_encode(['success' => false, 'message' => 'Invalid request']);
     exit;
 }
-
 // Database connection
 $servername = "localhost";
 $username = "root";

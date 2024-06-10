@@ -22,9 +22,10 @@ if (isset($_SESSION['supplier'])) {
 
     // Prepare and execute the query
     $sql = "SELECT s.supplier_id, s.supplier_name, s.contact_person, s.contact_number, p.product_id, p.product_name, p.price
-            FROM Supplier s
-            JOIN Products p ON s.supplier_id = p.supplier_id
-            WHERE s.supplier_id = ?";
+        FROM Supplier s
+        LEFT JOIN Products p ON s.supplier_id = p.supplier_id
+        WHERE s.supplier_id = ?";
+
     
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $supplier_id);
@@ -32,20 +33,30 @@ if (isset($_SESSION['supplier'])) {
     $result = $stmt->get_result();
 
     // Check if supplier exists
-    if ($result->num_rows > 0) {
-        // Fetch the data
-        $row = $result->fetch_assoc();
-    } else {
-        $row = [
-            'supplier_id' => 'N/A',
-            'supplier_name' => 'N/A',
-            'contact_person' => 'N/A',
-            'contact_number' => 'N/A',
-            'product_id' => 'N/A',
-            'product_name' => 'N/A',
-            'price' => 'N/A',
-        ];
-    }
+    // Check if supplier exists
+if ($result->num_rows > 0) {
+    // Fetch the data
+    $row = $result->fetch_assoc();
+} else {
+    // If no supplier found, set default values
+    $row = [
+        'supplier_id' => 'N/A',
+        'supplier_name' => 'N/A',
+        'contact_person' => 'N/A',
+        'contact_number' => 'N/A',
+        'product_id' => 'N/A',
+        'product_name' => 'N/A',
+        'price' => 'N/A',
+    ];
+}
+
+// If there are no products associated, set product-related fields to 'N/A'
+if (is_null($row['product_id'])) {
+    $row['product_id'] = 'N/A';
+    $row['product_name'] = 'N/A';
+    $row['price'] = 'N/A';
+}
+
 
     $stmt->close();
     $conn->close();
